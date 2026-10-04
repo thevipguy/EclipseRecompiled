@@ -25,6 +25,10 @@ jobs:
         run: |
           xcodebuild -version
           rustc --version
+      - name: Diagnose legacy nix dependency for iOS
+        run: |
+          cargo tree -p gcrecomp-runtime --target aarch64-apple-ios -i nix@0.24.3 2>&1 | tee ios-nix-dependency.log
+        shell: bash
       - name: Probe iOS runtime compatibility
         run: |
           cargo check -p gcrecomp-runtime --lib --target aarch64-apple-ios 2>&1 | tee ios-runtime-check.log
@@ -35,5 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-runtime-check-log
-          path: ios-runtime-check.log
+          path: |
+            ios-runtime-check.log
+            ios-nix-dependency.log
           if-no-files-found: warn
